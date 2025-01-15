@@ -1,0 +1,57 @@
+body{
+  background-image: url(https://www.caandesign.com/wp-content/uploads/2016/08/characteristic-villa-forests-around-naarden-netherlands-unique-eco-roof-04-1068x712.jpg);
+  background-size: cover;
+  background-position: center;
+  justify-content: center;
+  align-items: center;
+}
+
+div.frm{
+    max-width: 400px;
+    margin: 0 auto;
+    background-color: #ffffffae;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: rgb(255, 255, 255);
+    -webkit-text-stroke: 1px black;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  form {
+    display: grid;
+    gap: 5px;
+  }
+
+  /*form reservasi*/
+input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="email"],
+  button {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    opacity: 0.7;
+  }
