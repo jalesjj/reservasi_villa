@@ -1,60 +1,397 @@
-<!--form-reservasi.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservasi Vila</title>
+    <title>Reservasi Villa - BesteVilla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Tambahkan flatpickr untuk date picker yang lebih baik -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_orange.css">
     <link rel="stylesheet" href="/css/reservasi.css">
 </head>
 
 <body>
-    <h1>Reservasi Vila</h1>
-    <div class="frm">
-        <form id="reservasiForm" action="/reservasi" method="POST" enctype="multipart/form-data">
+    <div class="page-container">
+        <div class="back-link">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Kembali ke Beranda</a>
+        </div>
 
-            <label for="pilihanVila">Pilih Vila:</label>
-            <select id="pilihanVila" name="pilihanVila" required>
-                <option value="">-- Pilih Vila --</option>
-                <option value="Vila Jales">Vila Jales</option>
-                <option value="Vila Akmal">Vila Akmal</option>
-                <option value="Vila Rizaldi">Vila Rizaldi</option>
-            </select><br>
+        <div class="form-container">
+            <div class="form-header">
+                <h1>Reservasi Villa</h1>
+                <p>Isi data berikut untuk memesan villa pilihan Anda</p>
+            </div>
+            
+            <form id="reservasiForm" action="/reservasi" method="POST" enctype="multipart/form-data">
+                <div class="form-card">
+                    <div class="card-header">
+                        <i class="fas fa-building"></i> Pilihan Villa
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pilihanVila">Pilih Villa:</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-home"></i>
+                            <select id="pilihanVila" name="pilihanVila" required>
+                                <option value="">-- Pilih Villa --</option>
+                                <option value="Vila Jales">Villa Jales</option>
+                                <option value="Vila Akmal">Villa Akmal</option>
+                                <option value="Vila Rizaldi">Villa Rizaldi</option>
+                            </select>
+                        </div>
+                        <div class="helper-text">Pilih villa terlebih dahulu untuk melihat ketersediaan tanggal</div>
+                    </div>
+                </div>
 
-            <label for="buktiDP">Upload Bukti DP:</label>
-            <input type="file" id="buktiDP" name="buktiDP" accept="image/*,application/pdf" required><br>
+                <div class="form-card">
+                    <div class="card-header">
+                        <i class="fas fa-calendar"></i> Tanggal Menginap
+                    </div>
+                    
+                    <div class="date-status-info" id="dateAvailabilityInfo">
+                        <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+                        <div class="info-text">Silakan pilih villa terlebih dahulu untuk melihat ketersediaan tanggal</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="checkIn">Tanggal Check In:</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                                <input type="text" id="checkIn" name="checkIn" placeholder="Pilih tanggal check-in" readonly required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="jamCheckIn">Jam Check In:</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-clock"></i>
+                                <input type="time" id="jamCheckIn" name="jamCheckIn" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="checkOut">Tanggal Check Out:</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                                <input type="text" id="checkOut" name="checkOut" placeholder="Pilih tanggal check-out" readonly required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="jamCheckOut">Jam Check Out:</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-clock"></i>
+                                <input type="time" id="jamCheckOut" name="jamCheckOut" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <label for="nama">Nama:</label>
-            <input type="text" id="nama" name="nama" placeholder="Nama anda..." required><br>
+                <div class="form-card">
+                    <div class="card-header">
+                        <i class="fas fa-user"></i> Data Pribadi
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nama">Nama Lengkap:</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap Anda" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="alamat">Alamat:</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-home"></i>
+                            <input type="text" id="alamat" name="alamat" placeholder="Masukkan alamat rumah Anda" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alamatEmail">Email:</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="alamatEmail" name="alamatEmail" placeholder="email@example.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nomorHP">Nomor HP:</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-phone"></i>
+                                <input type="tel" id="nomorHP" name="nomorHP" placeholder="08xxxxxxxxxx" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jumlahOrang">Jumlah Orang:</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-users"></i>
+                            <input type="number" id="jumlahOrang" name="jumlahOrang" min="1" placeholder="Masukkan jumlah orang" required>
+                        </div>
+                    </div>
+                </div>
 
-            <label for="alamat">Alamat rumah:</label>
-            <input type="text" id="alamat" name="alamat" placeholder="alamat rumah anda..." required><br>
+                <div class="form-card">
+                    <div class="card-header">
+                        <i class="fas fa-money-bill"></i> Pembayaran
+                    </div>
+                    
+                    <div class="form-group file-upload">
+                        <label for="buktiDP">
+                            <i class="fas fa-upload"></i> Upload Bukti DP:
+                            <span class="file-info">Klik untuk memilih file</span>
+                        </label>
+                        <input type="file" id="buktiDP" name="buktiDP" accept="image/*,application/pdf" required>
+                    </div>
+                    
+                    <div class="file-preview" id="filePreview">
+                        <!-- Preview will be shown here -->
+                    </div>
+                </div>
 
-            <label for="alamatEmail">Alamat Email:</label>
-            <input type="email" id="alamatEmail" name="alamatEmail" placeholder="Email anda..." required><br>
-
-            <label for="nomorHP">Nomor HP:</label>
-            <input type="tel" id="nomorHP" name="nomorHP" placeholder="no hp anda..." required><br>
-
-            <label for="jumlahOrang">Jumlah Orang:</label>
-            <input type="number" id="jumlahOrang" name="jumlahOrang" placeholder="jumlah orang" required><br>
-
-            <label for="checkIn">Check In:</label>
-            <input type="date" id="checkIn" name="checkIn" required><br>
-
-            <label for="jamCheckIn">Jam Check In:</label>
-            <input type="time" id="jamCheckIn" name="jamCheckIn" required><br>
-
-            <label for="checkOut">Check Out:</label>
-            <input type="date" id="checkOut" name="checkOut" required><br>
-
-            <label for="jamCheckOut">Jam Check Out:</label>
-            <input type="time" id="jamCheckOut" name="jamCheckOut" required><br>
-
-            <button type="submit">Reservasi</button>
-        </form>
+                <div class="action-buttons">
+                    <button type="button" onclick="window.location.href='ketersediaan.html'" class="btn-secondary">Cek Ketersediaan</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-check"></i> Reservasi Sekarang</button>
+                </div>
+            </form>
+        </div>
     </div>
-    
-    <script src="/js/script.js"></script>
+
+    <!-- Scripts -->
+    <script src="/jquery/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referensi elemen form
+            const pilihanVilaSelect = document.getElementById('pilihanVila');
+            const checkInInput = document.getElementById('checkIn');
+            const checkOutInput = document.getElementById('checkOut');
+            const infoElement = document.getElementById('dateAvailabilityInfo');
+            
+            // Inisialisasi flatpickr dengan konfigurasi dasar
+            const checkInPicker = flatpickr(checkInInput, {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disableMobile: true,
+                onChange: function(selectedDates, dateStr) {
+                    if (selectedDates.length > 0) {
+                        // Set minimum date untuk checkout = checkin + 1 hari
+                        const nextDay = new Date(selectedDates[0]);
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        checkOutPicker.set('minDate', nextDay);
+                        
+                        // Reset checkout jika checkout <= checkin
+                        if (checkOutInput.value) {
+                            const checkOutDate = new Date(checkOutInput.value);
+                            if (checkOutDate <= selectedDates[0]) {
+                                checkOutPicker.setDate(nextDay);
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const checkOutPicker = flatpickr(checkOutInput, {
+                dateFormat: "Y-m-d",
+                minDate: new Date().fp_incr(1), // tomorrow
+                disableMobile: true
+            });
+            
+            // Set default value untuk jam check-in dan check-out
+            document.getElementById('jamCheckIn').value = '14:00';
+            document.getElementById('jamCheckOut').value = '12:00';
+            
+            // Saat pemilihan villa berubah
+            pilihanVilaSelect.addEventListener('change', function() {
+                const selectedVilla = this.value;
+                
+                if (selectedVilla) {
+                    // Reset date pickers
+                    checkInInput.value = '';
+                    checkOutInput.value = '';
+                    
+                    // Aktifkan loading state
+                    infoElement.innerHTML = `
+                        <div class="info-icon loading"><i class="fas fa-spinner fa-spin"></i></div>
+                        <div class="info-text">Mengecek ketersediaan untuk ${selectedVilla}...</div>
+                    `;
+                    
+                    // Fetch data tanggal yang tidak tersedia
+                    fetchUnavailableDates(selectedVilla);
+                } else {
+                    infoElement.innerHTML = `
+                        <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+                        <div class="info-text">Silakan pilih villa terlebih dahulu untuk melihat ketersediaan tanggal</div>
+                    `;
+                }
+            });
+            
+            // Fungsi untuk mengambil tanggal tidak tersedia dari API
+            function fetchUnavailableDates(villa) {
+                const timestamp = new Date().getTime();
+                
+                fetch(`/unavailable-dates?_t=${timestamp}`, {
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Unavailable dates data received:', data);
+                    processUnavailableDates(villa, data);
+                })
+                .catch(error => {
+                    console.error('Error fetching unavailable dates:', error);
+                    
+                    // Fallback ke data statis jika API gagal
+                    const fallbackData = getFallbackUnavailableDates();
+                    processUnavailableDates(villa, fallbackData);
+                    
+                    infoElement.innerHTML = `
+                        <div class="info-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="info-text">Menggunakan data offline. Beberapa informasi mungkin tidak akurat.</div>
+                    `;
+                });
+            }
+            
+            // Data statis untuk fallback
+            function getFallbackUnavailableDates() {
+                return {
+                    'Vila Jales': [
+                        { checkIn: '21/05/2025', checkOut: '23/05/2025' },
+                        { checkIn: '28/05/2025', checkOut: '30/05/2025' }
+                    ],
+                    'Vila Akmal': [
+                        { checkIn: '18/05/2025', checkOut: '20/05/2025' },
+                        { checkIn: '25/05/2025', checkOut: '27/05/2025' }
+                    ],
+                    'Vila Rizaldi': [
+                        { checkIn: '15/05/2025', checkOut: '18/05/2025' },
+                        { checkIn: '01/06/2025', checkOut: '05/06/2025' }
+                    ]
+                };
+            }
+            
+            // Proses tanggal tidak tersedia dan update date picker
+            function processUnavailableDates(villa, data) {
+                const villaData = data[villa] || [];
+                
+                // Konversi tanggal dari format DD/MM/YYYY menjadi array tanggal untuk flatpickr
+                const disabledDates = [];
+                
+                villaData.forEach(booking => {
+                    // Parse tanggal check-in dan check-out
+                    const checkInParts = booking.checkIn.split('/');
+                    const checkOutParts = booking.checkOut.split('/');
+                    
+                    if (checkInParts.length === 3 && checkOutParts.length === 3) {
+                        // Konversi ke objek Date (format DD/MM/YYYY)
+                        const checkInDate = new Date(
+                            parseInt(checkInParts[2]), // year
+                            parseInt(checkInParts[1]) - 1, // month (0-based)
+                            parseInt(checkInParts[0]) // day
+                        );
+                        
+                        const checkOutDate = new Date(
+                            parseInt(checkOutParts[2]), // year
+                            parseInt(checkOutParts[1]) - 1, // month (0-based)
+                            parseInt(checkOutParts[0]) // day
+                        );
+                        
+                        // Tambahkan semua tanggal dalam rentang ke array tanggal dinonaktifkan
+                        let currentDate = new Date(checkInDate);
+                        
+                        while (currentDate <= checkOutDate) {
+                            disabledDates.push(new Date(currentDate));
+                            currentDate.setDate(currentDate.getDate() + 1);
+                        }
+                    }
+                });
+                
+                // Update flatpickr dengan tanggal yang dinonaktifkan
+                checkInPicker.set('disable', disabledDates);
+                checkOutPicker.set('disable', disabledDates);
+                
+                // Update informasi ketersediaan
+                if (villaData.length > 0) {
+                    const formattedDates = villaData.map(booking => 
+                        `${booking.checkIn} s/d ${booking.checkOut}`
+                    ).join(', ');
+                    
+                    infoElement.innerHTML = `
+                        <div class="info-icon warning"><i class="fas fa-exclamation-circle"></i></div>
+                        <div class="info-text">${villa} tidak tersedia pada tanggal: ${formattedDates}</div>
+                    `;
+                } else {
+                    infoElement.innerHTML = `
+                        <div class="info-icon success"><i class="fas fa-check-circle"></i></div>
+                        <div class="info-text">${villa} tersedia untuk semua tanggal mendatang</div>
+                    `;
+                }
+            }
+            
+            // File upload preview
+            document.getElementById('buktiDP').addEventListener('change', function(e) {
+                const filePreview = document.getElementById('filePreview');
+                const fileInfo = document.querySelector('.file-info');
+                
+                if (this.files && this.files[0]) {
+                    const fileName = this.files[0].name;
+                    fileInfo.textContent = fileName;
+                    
+                    // Preview gambar atau tampilkan ikon PDF
+                    if (this.files[0].type.match('image.*')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            filePreview.innerHTML = `
+                                <div class="preview-container">
+                                    <img src="${e.target.result}" alt="Preview">
+                                    <p>${fileName}</p>
+                                </div>
+                            `;
+                        }
+                        reader.readAsDataURL(this.files[0]);
+                    } else {
+                        filePreview.innerHTML = `
+                            <div class="preview-container">
+                                <div class="pdf-icon"><i class="fas fa-file-pdf"></i></div>
+                                <p>${fileName}</p>
+                            </div>
+                        `;
+                    }
+                }
+            });
+            
+            // Validasi form sebelum submit
+            document.getElementById('reservasiForm').addEventListener('submit', function(event) {
+                const selectedVilla = pilihanVilaSelect.value;
+                const checkInDate = checkInInput.value;
+                const checkOutDate = checkOutInput.value;
+                
+                if (!selectedVilla || !checkInDate || !checkOutDate) {
+                    event.preventDefault();
+                    alert('Silakan lengkapi data villa dan tanggal menginap.');
+                    return false;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
