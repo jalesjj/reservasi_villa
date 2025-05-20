@@ -1,156 +1,163 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
+const oracledb = require('oracledb');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 2207;
 
-// Koneksi ke MongoDB
-mongoose.connect('mongodb://localhost:27017/reservasi_vila', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-
-// Digunakan untuk melayani file CSS, image, js
-app.use(express.static('public'))
-
-// Digunakan untuk melayani folder vendor
-app.use(express.static('vendor'))
-
-// Skema dan model untuk data reservasi
-const reservasiSchema = new mongoose.Schema({
-    nama: String,
-    alamat: String,
-    alamatEmail: String,
-    nomorHP: String,
-    jumlahOrang: Number,
-    checkIn: { type: Date, required: true },
-    jamCheckIn: String,
-    checkOut: { type: Date, required: true },
-    jamCheckOut: String
-});
-
-const Reservasi = mongoose.model('Reservasi', reservasiSchema);
-
-// Skema dan model untuk data kontak
-const kontakSchema = new mongoose.Schema({
-    nama: String,
-    alamatEmail: String,
-    subject: String,
-    message: String
-});
-
-const Kontak = mongoose.model('Kontak', kontakSchema);
-
-// Skema dan model untuk data kritik dan saran
-const kritikSaranSchema = new mongoose.Schema({
-    nama: String,
-    judul: String,
-    kritikSaran: String
-});
-
-const KritikSaran = mongoose.model('KritikSaran', kritikSaranSchema);
+// Konfigurasi Oracle
+const dbConfig = {
+  user: 'C##JALES',
+  password: 'jales123',
+  connectString: 'localhost/orcl' // Ganti sesuai SID/Service Name
+};
 
 // Middleware
+app.use(express.static('public'));
+app.use(express.static('vendor'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static('public'));
 
-// Endpoint untuk menambahkan reservasi
-app.post('/reservasi', (req, res) => {
-    const { nama, alamat, alamatEmail, nomorHP, jumlahOrang, checkIn, jamCheckIn, checkOut, jamCheckOut } = req.body;
-    const reservasi = new Reservasi({
-        nama,
-        alamat,
-        alamatEmail,
-        nomorHP,
-        jumlahOrang,
-        checkIn: new Date(checkIn),
-        jamCheckIn,
-        checkOut: new Date(checkOut),
-        jamCheckOut
-    });
+// ==============================
+// Konfigurasi Upload File
+// ==============================
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = 'public/uploads/';
+    fs.mkdirSync(uploadPath, { recursive: true });
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '_' + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({ storage });
 
-    reservasi.save()
-        .then(() => {
-            res.status(201).send('Reservasi berhasil ditambahkan');
-        })
-        .catch(err => {
-            res.status(400).send('Gagal menambahkan reservasi');
-        });
+// ==============================
+// Endpoint RESERVASI
+// ==============================
+app.post('/reservasi', upload.single('buktiDP'), async (req, res) => {
+  try {
+    // Tambahkan log untuk debugging
+    console.log("Form data received:", req.body);
+    console.log("File received:", req.file);
+    
+    const {
+      nama, alamat, alamatEmail, nomorHP,
+      jumlahOrang, checkIn, jamCheckIn,
+      checkOut, jamCheckOut, pilihanVila
+    } = req.body;
+
+    const buktiDP = req.file ? req.file.filename : null;
+    
+    // Log nilai yang akan dikirim ke database
+    console.log("pilihanVila:", pilihanVila);
+    console.log("buktiDP:", buktiDP);
+
+    const connection = await oracledb.getConnection(dbConfig);
+
+    await connection.execute(
+      `INSERT INTO reservasi 
+      (nama, alamat, alamatEmail, nomorHP, jumlahOrang, checkIn, jamCheckIn, checkOut, jamCheckOut, pilihanVila, buktiDP)
+      VALUES (:nama, :alamat, :alamatEmail, :nomorHP, :jumlahOrang, TO_DATE(:checkIn, 'YYYY-MM-DD'), :jamCheckIn, TO_DATE(:checkOut, 'YYYY-MM-DD'), :jamCheckOut, :pilihanVila, :buktiDP)`,
+      {
+        nama, alamat, alamatEmail, nomorHP,
+        jumlahOrang: parseInt(jumlahOrang),
+        checkIn, jamCheckIn,
+        checkOut, jamCheckOut,
+        pilihanVila,
+        buktiDP
+      },
+      { autoCommit: true }
+    );
+
+    await connection.close();
+    res.status(201).send('Reservasi berhasil ditambahkan');
+  } catch (error) {
+    console.error("Error in reservasi endpoint:", error);
+    res.status(500).send('Gagal menambahkan reservasi');
+  }
 });
 
-// Endpoint untuk melihat semua reservasi
-app.get('/reservasi', (req, res) => {
-    Reservasi.find({}, (err, reservasis) => {
-        if (err) {
-            res.status(500).send('Terjadi kesalahan');
-        } else {
-            res.status(200).json(reservasis);
-        }
-    });
+// ==============================
+// Endpoint KONTAK
+// ==============================
+app.post('/kontakkami', async (req, res) => {
+  const { nama, alamatEmail, subject, message } = req.body;
+
+  try {
+    const conn = await oracledb.getConnection(dbConfig);
+
+    await conn.execute(
+      `INSERT INTO kontak (nama, alamatEmail, subject, message)
+       VALUES (:nama, :alamatEmail, :subject, :message)`,
+      { nama, alamatEmail, subject, message },
+      { autoCommit: true }
+    );
+
+    await conn.close();
+    res.status(201).send('Pesan berhasil dikirim');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Gagal mengirim pesan');
+  }
 });
 
-// Endpoint untuk menambahkan kontak
-app.post('/kontakkami', (req, res) => {
-    const { nama, alamatEmail, subject, message } = req.body;
-    const kontak = new Kontak({
-        nama,
-        alamatEmail,
-        subject,
-        message
-    });
+app.get('/kontakkami', async (req, res) => {
+  try {
+    const conn = await oracledb.getConnection(dbConfig);
+    const result = await conn.execute(`SELECT * FROM kontak`);
+    await conn.close();
 
-    kontak.save()
-        .then(() => {
-            res.status(201).send('Pesan berhasil dikirim');
-        })
-        .catch(err => {
-            res.status(400).send('Gagal mengirim pesan');
-        });
+    res.status(200).json(result.rows);
+  } catch (err) {
+    res.status(500).send('Terjadi kesalahan');
+  }
 });
 
-// Endpoint untuk melihat semua kontak
-app.get('/kontakkami', (req, res) => {
-    Kontak.find({}, (err, kontaks) => {
-        if (err) {
-            res.status(500).send('Terjadi kesalahan');
-        } else {
-            res.status(200).json(kontaks);
-        }
-    });
+// ==============================
+// Endpoint KRITIK & SARAN
+// ==============================
+app.post('/kritiksaran', async (req, res) => {
+  const { nama, judul, kritikSaran } = req.body;
+
+  try {
+    const conn = await oracledb.getConnection(dbConfig);
+
+    await conn.execute(
+      `INSERT INTO kritiksaran (nama, judul, kritikSaran)
+       VALUES (:nama, :judul, :kritikSaran)`,
+      { nama, judul, kritikSaran },
+      { autoCommit: true }
+    );
+
+    await conn.close();
+    res.status(201).send('Kritik dan saran berhasil dikirim');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Gagal mengirim kritik dan saran');
+  }
 });
 
-// Endpoint untuk menambahkan kritik dan saran
-app.post('/kritiksaran', (req, res) => {
-    const { nama, judul, kritikSaran } = req.body;
-    const kritikSaranData = new KritikSaran({
-        nama,
-        judul,
-        kritikSaran
-    });
+app.get('/kritiksaran', async (req, res) => {
+  try {
+    const conn = await oracledb.getConnection(dbConfig);
+    const result = await conn.execute(`SELECT * FROM kritiksaran`);
+    await conn.close();
 
-    kritikSaranData.save()
-        .then(() => {
-            res.status(201).send('Kritik dan saran berhasil dikirim');
-        })
-        .catch(err => {
-            res.status(400).send('Gagal mengirim kritik dan saran');
-        });
+    res.status(200).json(result.rows);
+  } catch (err) {
+    res.status(500).send('Terjadi kesalahan');
+  }
 });
 
-// Endpoint untuk melihat semua kritik dan saran
-app.get('/kritiksaran', (req, res) => {
-    KritikSaran.find({}, (err, kritiksarans) => {
-        if (err) {
-            res.status(500).send('Terjadi kesalahan');
-        } else {
-            res.status(200).json(kritiksarans);
-        }
-    });
-});
-
-// Menjalankan server
+// ==============================
+// Jalankan server
+// ==============================
 app.listen(PORT, () => {
-    console.log(`Server berjalan pada http://localhost:${PORT}`);
+  console.log(`Server berjalan di http://localhost:${PORT}`);
 });

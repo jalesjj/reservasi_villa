@@ -41,6 +41,29 @@ figure, header, nav, section, article, aside, footer, figcaption {
   outline: 0;
 }
 
+.icon-button {
+  display: inline-block;
+}
+
+.dp-link {
+  display: flex;
+  align-items: center;
+  background-color: #000; /* Black background as seen in your image */
+  color: white;
+  padding: 8px 12px;
+  border-radius: 16px; /* Rounded corners like in your image */
+  text-decoration: none;
+}
+
+.fa {
+  /* Force the icon to take up space even if it doesn't load */
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+  text-align: center;
+}
+
 .clearfix:after {
   content: ".";
   display: block;
@@ -158,7 +181,9 @@ body {
 }
 
 .icon-button a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   background-color: #1e1e1e;
   color: #fff;
   font-size: 14px;
@@ -168,6 +193,10 @@ body {
   padding: 0px 30px 0px 0px;
   border-radius: 25px;
   transition: all .3s;
+}
+
+.icon-button i {
+  margin-right: 5px;
 }
 
 .icon-button a i {

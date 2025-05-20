@@ -1,0 +1,1 @@
+oracledb-6.8.0-win32-x64.node v20.0.0 1e47f3ef9289df6513744f8cff1ad648f989c8af 6fa744509b8144c7bd2a25a1cb1e7dd8f746d31f Wed, 12 Feb 2025 09:31:59 GMT

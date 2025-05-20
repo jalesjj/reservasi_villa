@@ -1,3 +1,4 @@
+<!--form-reservasi.html-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +11,19 @@
 <body>
     <h1>Reservasi Vila</h1>
     <div class="frm">
-        <form id="reservasiForm">
+        <form id="reservasiForm" action="/reservasi" method="POST" enctype="multipart/form-data">
+
+            <label for="pilihanVila">Pilih Vila:</label>
+            <select id="pilihanVila" name="pilihanVila" required>
+                <option value="">-- Pilih Vila --</option>
+                <option value="Vila Jales">Vila Jales</option>
+                <option value="Vila Akmal">Vila Akmal</option>
+                <option value="Vila Rizaldi">Vila Rizaldi</option>
+            </select><br>
+
+            <label for="buktiDP">Upload Bukti DP:</label>
+            <input type="file" id="buktiDP" name="buktiDP" accept="image/*,application/pdf" required><br>
+
             <label for="nama">Nama:</label>
             <input type="text" id="nama" name="nama" placeholder="Nama anda..." required><br>
 

@@ -1,3 +1,3 @@
 # reservasi_villa
 
-yang masuk  mongodb kontaks, kritiksarans, reservasis.
+yang masuk  oracledb kontaks, kritiksarans, reservasis.
