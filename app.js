@@ -1,3 +1,4 @@
+// app.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const oracledb = require('oracledb');
@@ -120,40 +121,189 @@ app.get('/kontakkami', async (req, res) => {
 });
 
 // ==============================
-// Endpoint KRITIK & SARAN
+// Endpoint CHECK AVAILABILITY
 // ==============================
-app.post('/kritiksaran', async (req, res) => {
-  const { nama, judul, kritikSaran } = req.body;
-
+app.get('/check-availability', async (req, res) => {
   try {
-    const conn = await oracledb.getConnection(dbConfig);
+    console.log('Check availability request received:', req.query);
+    const { checkInDate, checkOutDate } = req.query;
+    
+    if (!checkInDate || !checkOutDate) {
+      console.log('Missing required dates');
+      return res.status(400).json({ error: 'Tanggal check-in dan check-out diperlukan' });
+    }
+    
+    // Validasi format tanggal
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(checkInDate) || !/^\d{4}-\d{2}-\d{2}$/.test(checkOutDate)) {
+      console.log('Invalid date format');
+      return res.status(400).json({ error: 'Format tanggal harus YYYY-MM-DD' });
+    }
+    
+    try {
+      console.log('Connecting to database...');
+      const connection = await oracledb.getConnection(dbConfig);
+      console.log('Database connection established');
+      
+      // Logging query parameters
+      console.log('Query parameters:', { checkInDate, checkOutDate });
+      
+      // PENTING: Coba query sederhana dulu untuk memastikan bisa mengakses tabel
+      const testQuery = await connection.execute(
+        `SELECT COUNT(*) AS TOTAL FROM reservasi`,
+        {},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      console.log('Test query result:', testQuery.rows[0]);
+      
+      // Jika testQuery berhasil, jalankan query utama
+      const result = await connection.execute(
+        `SELECT pilihanVila 
+         FROM reservasi 
+         WHERE 
+         (TO_DATE(:checkInDate, 'YYYY-MM-DD') BETWEEN checkIn AND checkOut - 1)
+         OR
+         (TO_DATE(:checkOutDate, 'YYYY-MM-DD') - 1 BETWEEN checkIn AND checkOut - 1)
+         OR
+         (checkIn BETWEEN TO_DATE(:checkInDate, 'YYYY-MM-DD') AND TO_DATE(:checkOutDate, 'YYYY-MM-DD') - 1)`,
+        { checkInDate, checkOutDate },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      
+      console.log('Query executed successfully');
+      console.log('Overlapping reservations found:', result.rows.length);
+      console.log('Query results:', result.rows);
+      
+      await connection.close();
+      console.log('Database connection closed');
+      
+      // Membuat variabel untuk tracking ketersediaan vila - default TERSEDIA (true)
+      let vilaJalesBooked = false;
+      let vilaAkmalBooked = false;
+      let vilaRizaldiBooked = false;
+      
+      // Jika ada hasil, ubah status menjadi tidak tersedia
+      if (result.rows && result.rows.length > 0) {
+        for (const reservation of result.rows) {
+          const villa = reservation.PILIHANVILA; // Oracle DB mengembalikan nama kolom dalam huruf besar
+          console.log('Found booking for villa:', villa);
+          
+          if (villa === 'Vila Jales') {
+            vilaJalesBooked = true;
+          } else if (villa === 'Vila Akmal') {
+            vilaAkmalBooked = true;
+          } else if (villa === 'Vila Rizaldi') {
+            vilaRizaldiBooked = true;
+          }
+        }
+      }
+      
+      // Siapkan respons - jika tidak ada booking, semua villa tersedia
+      const response = {
+        vilajales: !vilaJalesBooked,
+        vilaakmal: !vilaAkmalBooked,
+        vilarizaldi: !vilaRizaldiBooked
+      };
+      
+      console.log('Sending response:', response);
+      
+      // Set headers untuk mencegah caching
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+      
+      res.status(200).json(response);
+      
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      // Tangani kasus khusus jika tabel belum ada
+      if (dbError.message && dbError.message.includes('ORA-00942')) {
+        // Tabel tidak ada - mungkin pengguna belum menjalankan script pembuatan tabel
+        console.log('Table does not exist - sending fallback response');
+        return res.status(200).json({
+          vilajales: true,
+          vilaakmal: true,
+          vilarizaldi: true
+        });
+      }
+      throw dbError; // Kirim ulang error untuk ditangani oleh catch blok luar
+    }
+    
+  } catch (error) {
+    console.error("Error checking availability:", error);
+    res.status(500).json({ error: 'Gagal memeriksa ketersediaan: ' + error.message });
+  }
+});
 
-    await conn.execute(
-      `INSERT INTO kritiksaran (nama, judul, kritikSaran)
-       VALUES (:nama, :judul, :kritikSaran)`,
-      { nama, judul, kritikSaran },
-      { autoCommit: true }
+// ==============================
+// Endpoint GET UNAVAILABLE DATES
+// ==============================
+app.get('/unavailable-dates', async (req, res) => {
+  try {
+    console.log('Request for unavailable dates received');
+    const connection = await oracledb.getConnection(dbConfig);
+    
+    // Query untuk mendapatkan semua tanggal pemesanan dari database
+    const result = await connection.execute(
+      `SELECT 
+         pilihanVila, 
+         TO_CHAR(checkIn, 'YYYY-MM-DD') AS checkInDate, 
+         TO_CHAR(checkOut, 'YYYY-MM-DD') AS checkOutDate
+       FROM reservasi 
+       ORDER BY checkIn`,
+      {},
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-
-    await conn.close();
-    res.status(201).send('Kritik dan saran berhasil dikirim');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Gagal mengirim kritik dan saran');
+    
+    await connection.close();
+    
+    // Kelompokkan hasil berdasarkan vila
+    const unavailableDates = {
+      'Vila Jales': [],
+      'Vila Akmal': [],
+      'Vila Rizaldi': []
+    };
+    
+    // Proses data untuk setiap reservasi
+    result.rows.forEach(booking => {
+      const villa = booking.PILIHANVILA;
+      const checkIn = new Date(booking.CHECKINDATE);
+      const checkOut = new Date(booking.CHECKOUTDATE);
+      
+      // Ubah format tanggal ke DD/MM/YYYY
+      const formattedCheckIn = formatDate(checkIn);
+      const formattedCheckOut = formatDate(checkOut);
+      
+      // Tambahkan ke array tanggal tidak tersedia
+      if (unavailableDates[villa]) {
+        unavailableDates[villa].push({
+          checkIn: formattedCheckIn,
+          checkOut: formattedCheckOut
+        });
+      }
+    });
+    
+    // Set headers untuk mencegah caching
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    res.status(200).json(unavailableDates);
+    
+  } catch (error) {
+    console.error('Error fetching unavailable dates:', error);
+    res.status(500).json({ error: 'Gagal mengambil data tanggal tidak tersedia' });
   }
 });
 
-app.get('/kritiksaran', async (req, res) => {
-  try {
-    const conn = await oracledb.getConnection(dbConfig);
-    const result = await conn.execute(`SELECT * FROM kritiksaran`);
-    await conn.close();
-
-    res.status(200).json(result.rows);
-  } catch (err) {
-    res.status(500).send('Terjadi kesalahan');
-  }
-});
+// Helper function untuk format tanggal
+function formatDate(date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 
 // ==============================
 // Jalankan server

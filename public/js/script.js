@@ -1,3 +1,4 @@
+// script.js
 document.addEventListener('DOMContentLoaded', function () {
     // Form Reservasi
     const reservasiForm = document.getElementById('reservasiForm');

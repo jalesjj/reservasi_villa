@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <title>Ketersediaan Villa - BesteVilla</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Additional CSS Files -->
+  <link rel="stylesheet" href="/css/fontawesome.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/owl.css">
+  <link rel="stylesheet" href="/css/animate.css">
+  <link rel="stylesheet" href="https://unpkg.com/swiper@7/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="/css/ketersediaan.css">
+</head>
+
+<body>
+  <!-- ***** Preloader Start ***** -->
+  <div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+      <span class="dot"></span>
+      <div class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+  <!-- ***** Preloader End ***** -->
+
+  <div class="sub-header">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-8">
+          <ul class="info">
+            <li><i class="fa fa-envelope"></i> bestevilla@gmail.com</li>
+            <li><i class="fa fa-map"></i> Made, Lamongan</li>
+          </ul>
+        </div>
+        <div class="col-lg-4 col-md-4">
+          <ul class="social-links">
+            <li><a href="#"><i class="fab fa-facebook"></i></a></li>
+            <li><a href="https://x.com/" target="_blank"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fab fa-linkedin"></i></a></li>
+            <li><a href="https://www.instagram.com//"><i class="fab fa-instagram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ***** Header Area Start ***** -->
+  <header class="header-area header-sticky">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <nav class="main-nav">
+            <!-- ***** Logo Start ***** -->
+            <a href="index.html" class="logo">
+              <h1>BesteVilla</h1>
+            </a>
+            <!-- ***** Logo End ***** -->
+            <!-- ***** Menu Start ***** -->
+            <ul class="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="ketersediaan.html" class="active">Cek Ketersediaan</a></li>
+              <li><a href="contact.html">Contact Us</a></li>
+              <li><a href="form-reservasi.html"><i class="fas fa-calendar"></i> Reservasi</a>
+              </li>
+            </ul>
+            <a class='menu-trigger'>
+              <span>Menu</span>
+            </a>
+            <!-- ***** Menu End ***** -->
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- ***** Header Area End ***** -->
+
+  <div class="page-heading">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h2>Ketersediaan Villa</h2>
+          <span>Cek ketersediaan villa untuk tanggal yang Anda inginkan</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="availability-section section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="availability-form">
+            <h4 class="text-center mb-4">Cek Ketersediaan Villa</h4>
+            <form id="checkAvailabilityForm">
+              <div class="row">
+                <div class="col-lg-5">
+                  <fieldset>
+                    <label for="checkInDate">Tanggal Check-in:</label>
+                    <input type="date" id="checkInDate" name="checkInDate" required>
+                  </fieldset>
+                </div>
+                <div class="col-lg-5">
+                  <fieldset>
+                    <label for="checkOutDate">Tanggal Check-out:</label>
+                    <input type="date" id="checkOutDate" name="checkOutDate" required>
+                  </fieldset>
+                </div>
+                <div class="col-lg-2">
+                  <fieldset>
+                    <button type="submit" id="check-btn" class="orange-button">Cek</button>
+                  </fieldset>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-5">
+        <div class="col-lg-4">
+          <div class="villa-card" id="vilaJales">
+            <img src="/images/villa_1/villa-1.png" alt="Villa Jales" class="img-fluid">
+            <div class="villa-details">
+              <h3>Villa Jales</h3>
+              <div class="villa-status" id="vilaJalesStatus">
+                <p>Silakan pilih tanggal untuk melihat ketersediaan</p>
+              </div>
+              <a href="vila-1.html" class="btn btn-sm btn-outline-secondary mt-3">Lihat Detail</a>
+              <a href="form-reservasi.html" class="btn btn-sm btn-primary mt-3">Reservasi</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="villa-card" id="vilaAkmal">
+            <img src="/images/villa_2/villa_2.png" alt="Villa Akmal" class="img-fluid">
+            <div class="villa-details">
+              <h3>Villa Akmal</h3>
+              <div class="villa-status" id="vilaAkmalStatus">
+                <p>Silakan pilih tanggal untuk melihat ketersediaan</p>
+              </div>
+              <a href="vila-2.html" class="btn btn-sm btn-outline-secondary mt-3">Lihat Detail</a>
+              <a href="form-reservasi.html" class="btn btn-sm btn-primary mt-3">Reservasi</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="villa-card" id="vilaRizaldi">
+            <img src="/images/villa_3/villa_3.png" alt="Villa Rizaldi" class="img-fluid">
+            <div class="villa-details">
+              <h3>Villa Rizaldi</h3>
+              <div class="villa-status" id="vilaRizaldiStatus">
+                <p>Silakan pilih tanggal untuk melihat ketersediaan</p>
+              </div>
+              <a href="vila-3.html" class="btn btn-sm btn-outline-secondary mt-3">Lihat Detail</a>
+              <a href="form-reservasi.html" class="btn btn-sm btn-primary mt-3">Reservasi</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-5">
+        <div class="col-lg-12">
+          <div class="unavailable-dates-section">
+            <h3 class="text-center mb-4">Tanggal Tidak Tersedia</h3>
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>Villa</th>
+                    <th>Tanggal Check-in</th>
+                    <th>Tanggal Check-out</th>
+                  </tr>
+                </thead>
+                <tbody id="unavailableDatesTable">
+                  <tr>
+                    <td colspan="3" class="text-center">Memuat data...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="col-lg-8">
+        <p>Copyright © 2024 BesteVilla., Ltd. All rights reserved.
+
+          Design by <a rel="nofollow" href="#" target="_blank">Kelompok 8</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Bootstrap core JavaScript -->
+  <script src="/jquery/jquery.min.js"></script>
+  <script src="/bootstrap/js/bootstrap.min.js"></script>
+  <script src="/js/isotope.min.js"></script>
+  <script src="/js/owl-carousel.js"></script>
+  <script src="/js/counter.js"></script>
+  <script src="/js/custom.js"></script>
+  <script src="/js/ketersediaan.js"></script>
+</body>
+
+</html>
