@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pembayaran Midtrans</title>
+</head>
+<body>
+  <h2>Form Pembayaran</h2>
+  <form id="paymentForm">
+    <input type="text" name="order_id" placeholder="Order ID" required><br><br>
+    <input type="number" name="gross_amount" placeholder="Total Bayar (Rp)" required><br><br>
+    <input type="text" name="customer_name" placeholder="Nama" required><br><br>
+    <input type="email" name="customer_email" placeholder="Email" required><br><br>
+    <input type="text" name="customer_phone" placeholder="No. HP" required><br><br>
+    <button type="submit">Bayar Sekarang</button>
+  </form>
+
+  <script>
+    document.getElementById("paymentForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        order_id: form.order_id.value,
+        gross_amount: form.gross_amount.value,
+        customer_name: form.customer_name.value,
+        customer_email: form.customer_email.value,
+        customer_phone: form.customer_phone.value,
+      };
+
+      try {
+        const response = await fetch('/api/payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          window.location.href = result.redirect_url;
+        } else {
+          alert("Gagal membuat pembayaran: " + result.message);
+        }
+      } catch (error) {
+        alert("Terjadi kesalahan: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
