@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pembayaran</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="text-center">Form Pembayaran</h3>
+            </div>
+            <div class="card-body">
+              <form id="payment-form">
+                <div class="mb-3">
+                  <label for="customer_name" class="form-label"
+                    >Nama Lengkap</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="customer_name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="customer_email" class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="customer_email"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="customer_phone" class="form-label"
+                    >Nomor Telepon</label
+                  >
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="customer_phone"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="gross_amount" class="form-label"
+                    >Jumlah Pembayaran</label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="gross_amount"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Bayar Sekarang
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://app.sandbox.midtrans.com/snap/snap.js"
+      data-client-key="SB-Mid-client-4s6U-2lGi11T3znh"
+    ></script>
+    <script>
+      document
+        .getElementById("payment-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const order_id = "ORDER-" + Math.random().toString(36).substr(2, 9);
+          const customer_name = document.getElementById("customer_name").value;
+          const customer_email =
+            document.getElementById("customer_email").value;
+          const customer_phone =
+            document.getElementById("customer_phone").value;
+          const gross_amount = document.getElementById("gross_amount").value;
+
+          try {
+            const response = await fetch("/api/payment", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                order_id,
+                gross_amount,
+                customer_name,
+                customer_email,
+                customer_phone,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (data.token) {
+              window.snap.pay(data.token, {
+                onSuccess: function (result) {
+                  alert("Pembayaran berhasil!");
+                  window.location.href = "/";
+                },
+                onPending: function (result) {
+                  alert("Pembayaran pending!");
+                },
+                onError: function (result) {
+                  alert("Pembayaran gagal!");
+                },
+                onClose: function () {
+                  alert("Anda menutup popup tanpa menyelesaikan pembayaran");
+                },
+              });
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Terjadi kesalahan saat memproses pembayaran");
+          }
+        });
+    </script>
+  </body>
+</html>
